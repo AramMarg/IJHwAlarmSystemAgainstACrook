@@ -7,13 +7,23 @@ public class AlarmHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        _carpetAlarm.CarpetTouched += _alarmer.RunIncreaseAlarm;
-        _carpetAlarm.CrookWent += _alarmer.RunDecreaseAlarm;
+        _carpetAlarm.CarpetTouched += OnCarpetTouched;
+        _carpetAlarm.CrookWent += OnCrookWent;
     }
 
     private void OnDisable()
     {
-        _carpetAlarm.CarpetTouched -= _alarmer.RunIncreaseAlarm;
-        _carpetAlarm.CrookWent -= _alarmer.RunDecreaseAlarm;
+        _carpetAlarm.CarpetTouched -= OnCarpetTouched;
+        _carpetAlarm.CrookWent -= OnCrookWent;
+    }
+
+    private void OnCarpetTouched()
+    {
+        _alarmer.RunIncreaseAlarm();
+    }
+
+    private void OnCrookWent()
+    {
+        _alarmer.RunDecreaseAlarm();
     }
 }

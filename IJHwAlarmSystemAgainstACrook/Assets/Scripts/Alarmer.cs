@@ -14,11 +14,14 @@ public class Alarmer : MonoBehaviour
 
     private Coroutine _coroutine;
     private WaitForSeconds _wait;
+    private float _delay = 0.5f; 
 
     private void Awake()
     {
         _audioSource.loop = true;
         _audioSource.playOnAwake = false;
+
+        _wait = new WaitForSeconds(_delay);
     }
 
     public void RunIncreaseAlarm()
@@ -28,44 +31,33 @@ public class Alarmer : MonoBehaviour
             StopCoroutine(_coroutine);
         }
 
-        _coroutine = StartCoroutine(nameof(ControlVolume));
+        _coroutine = StartCoroutine(ControlVolume(_maxVolume));
 
         _audioSource.Play();
     }
 
     public void RunDecreaseAlarm()
     {
-        int tempForDecrease = -1;
-
         if (_coroutine != null)
         {
             StopCoroutine(_coroutine);
         }
 
-        _maxVolume = _minVolume;
-        _minVolume = _currentVolume;
-
-        _speedVolume *= tempForDecrease;
-
-        _coroutine = StartCoroutine(nameof(ControlVolume));
+        _coroutine = StartCoroutine(ControlVolume(_minVolume));
 
         _audioSource.Play();
     }
 
-    private IEnumerator ControlVolume()
+    private IEnumerator ControlVolume(float target)
     {
-        float currentMin = _minVolume;
-        float currentMax = _maxVolume;
-        float currentSpeed = _speedVolume;
+        while (!Mathf.Approximately(_currentVolume, target))
+        {
+            _currentVolume = Mathf.MoveTowards(_currentVolume, target,
+                _speedVolume);
 
-        _currentVolume = Mathf.MoveTowards(currentMin, currentMax,
-            currentSpeed);
+            _audioSource.volume = _currentVolume;
 
-        _audioSource.volume = _currentVolume;
-        //delete then
-        print(_audioSource.volume);
-
-        yield return new WaitUntil(() => _currentVolume == _minVolume
-        || _currentVolume == _maxVolume);
+            yield return _wait;
+        }
     }
 }
